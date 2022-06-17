@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./notes.db"
+}
+
+model Note {
+  id       String @id @default(cuid())
+  filePath String
+  title    String
+
+  language   Language? @relation(fields: [languageId], references: [id])
+  languageId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Language {
+  id    String @id @default(cuid())
+  name  String
+  notes Note[]
+
+  createdAt  DateTime                @default(now())
+  updatedAt  DateTime                @default(now())
+  categories CategoriesOnLanguages[]
+}
+
+model Category {
+  id    String @id @default(cuid())
+  name  String
+  notes Note[]
+
+  createdAt DateTime                @default(now())
+  updatedAt DateTime                @default(now())
+  languages CategoriesOnLanguages[]
+}
+
+model CategoriesOnLanguages {
+
+  Language   Language @relation(fields: [languageId], references: [id])
+  languageId String
+  Category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+
+  @@id([languageId, categoryId])
+}
